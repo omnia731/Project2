@@ -1,0 +1,87 @@
+const { Kafka } = require('kafkajs');
+const mongoose = require('mongoose');
+const dotenv = require('dotenv');
+const Event = require('/usr/src/app/dashboard/backend/src/events/eventModel');  // تأكد من استخدام الـ Event الصحيح
+
+dotenv.config();
+
+console.log("Kafka broker is:", process.env.KAFKA_BROKER);
+
+// إعداد الاتصال بـ Kafka
+const kafka = new Kafka({
+  clientId: 'test-consumer',
+  brokers: [process.env.KAFKA_BROKER || 'kafka:9092'],
+});
+
+const consumer = kafka.consumer({ groupId: 'test-group' });
+const topics = ['item-arrived', 'item-dispatched', 'low-stock'];
+
+const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+const run = async (retryCount = 0) => {
+  try {
+    const dbURI = process.env.MONGODB_URI || "mongodb://mongo:27017/dashboardDB";
+    console.log("⏳ Connecting to MongoDB:", dbURI);
+    await mongoose.connect(dbURI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      socketTimeoutMS: 45000,  // زيادة مهلة الاتصال
+      connectTimeoutMS: 30000,
+      serverSelectionTimeoutMS: 50000,
+    });
+    console.log("✅ Connected to MongoDB");
+
+    await delay(5000); // انتظار بسيط لضمان أن Kafka أصبح جاهزًا
+
+    await consumer.connect();
+    console.log('✅ Consumer connected to Kafka');
+
+    for (const topic of topics) {
+      await consumer.subscribe({ topic, fromBeginning: true });
+      console.log(`📌 Subscribed to topic: ${topic}`);
+    }
+
+    await consumer.run({
+      eachMessage: async ({ topic, partition, message }) => {
+        const event = JSON.parse(message.value.toString());
+        console.log(`\n📥 Received from [${topic}]`);
+        console.log(event);
+
+        const eventData = {};
+        for (const key in event) {
+          if (event[key] !== undefined && event[key] !== null) {
+            eventData[key] = event[key];
+          }
+        }
+
+        // تأكد من أن لديك warehouseId في البيانات القادمة من Kafka
+        if (eventData.warehouseId) {
+          try {
+            const event = new Event(eventData);
+            await event.save();
+            console.log('✅ Event saved to MongoDB');
+          } catch (error) {
+            console.error('❌ Error saving event to MongoDB:', error);
+          }
+        } else {
+          console.log("❌ Missing warehouseId, event skipped");
+        }
+      },
+    });
+
+  } catch (error) {
+    console.error('❌ Error in consumer:', error.message);
+
+    if (retryCount < 5) {
+      const delayTime = 5000;
+      console.log(`🔁 Retrying to connect in ${delayTime / 1000} seconds...`);
+      await delay(delayTime);
+      run(retryCount + 1);
+    } else {
+      console.log("❌ Max retries reached. Exiting.");
+    }
+  }
+};
+
+run().catch(console.error);
+

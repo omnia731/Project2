@@ -1,0 +1,89 @@
+<div>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light sticky-top shadow-lg">
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link text-white" routerLink="/login" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+              Login
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-white" routerLink="/register" routerLinkActive="active">
+              Register
+            </a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+  
+    <!-- Content -->
+    <router-outlet></router-outlet>
+  </div>
+  
+  <!-- Navbar Styling -->
+  <style>
+    /* Gradient Background for Navbar */
+    .navbar {
+      background: linear-gradient(135deg, #007bff, #00bcd4); /* Gradient effect */
+      margin-bottom: 20px;
+      border-radius: 0 0 15px 15px;
+    }
+  
+    /* Navbar Brand Styling */
+    .navbar-brand {
+      font-size: 1.8rem;
+      letter-spacing: 1px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      text-transform: uppercase;
+    }
+  
+    .navbar-toggler {
+      border-color: #fff;
+    }
+  
+    .navbar-toggler-icon {
+      background-color: #fff;
+    }
+  
+    /* Nav-Link Styling */
+    .nav-link {
+      font-size: 1rem;
+      padding: 12px 20px;
+      transition: color 0.3s, transform 0.2s ease-in-out;
+      text-decoration: none; /* Remove underline */
+    }
+  
+    /* Hover Effects */
+    .nav-link:hover {
+      color: #FFD700 !important;
+      transform: scale(1.1); /* Slightly enlarge on hover */
+    }
+  
+    /* Active Link Styling */
+    .nav-link.active {
+      color: #FFD700;
+      font-weight: bold;
+    }
+  
+    /* Navbar Color on Active/Hover */
+    .nav-item:hover {
+      background-color: rgba(255, 255, 255, 0.1); /* subtle background on hover */
+      border-radius: 5px;
+    }
+  
+    /* Sticky Navbar and Shadow */
+    .sticky-top {
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+  
+    .shadow-lg {
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+  </style>
+  

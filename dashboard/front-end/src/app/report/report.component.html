@@ -1,0 +1,29 @@
+<h2 style="text-align: center; margin-bottom: 20px;">
+  Inventory Report for {{ warehouseName }}
+</h2>
+
+<div *ngIf="isLoading" style="text-align: center; font-size: 18px;">
+  Loading...
+</div>
+
+<table *ngIf="!isLoading && warehouseItems.length > 0" class="inventory-table">
+  <thead>
+    <tr>
+      <th>Item Name</th>
+      <th>Quantity</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let item of warehouseItems">
+      <td>{{ item.itemName }}</td>
+      <td [ngClass]="{ 'low-stock': item.quantity < item.threshold }">
+        {{ item.quantity }}
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<div *ngIf="!isLoading && warehouseItems.length === 0" style="text-align: center; margin-top: 20px;">
+  No items found for this warehouse.
+</div>
+

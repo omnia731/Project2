@@ -1,0 +1,29 @@
+.inventory-table {
+  width: 80%;
+  margin: 0 auto;
+  border-collapse: collapse;
+  font-size: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.inventory-table th,
+.inventory-table td {
+  border: 1px solid #ddd;
+  padding: 12px;
+  text-align: center;
+}
+
+.inventory-table thead {
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+
+.inventory-table tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
+.low-stock {
+  color: red;
+  font-weight: bold;
+}
+
